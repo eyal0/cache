@@ -4597,6 +4597,7 @@ var Inputs;
     Inputs["Path"] = "path";
     Inputs["RestoreKeys"] = "restore-keys";
     Inputs["UploadChunkSize"] = "upload-chunk-size";
+    Inputs["Update"] = "update";
 })(Inputs = exports.Inputs || (exports.Inputs = {}));
 var Outputs;
 (function (Outputs) {
@@ -44494,8 +44495,13 @@ function run() {
                 return;
             }
             if (utils.isExactKeyMatch(primaryKey, state)) {
-                core.info(`Cache hit occurred on the primary key ${primaryKey}, not saving cache.`);
-                return;
+                if (core.getInput(constants_1.Inputs.Update) === "true") {
+                    core.info(`Cache hit occurred on the primary key ${primaryKey}, but updates were enabled, so updating cache.`);
+                }
+                else {
+                    core.info(`Cache hit occurred on the primary key ${primaryKey}, not saving cache.`);
+                    return;
+                }
             }
             const cachePaths = utils.getInputAsArray(constants_1.Inputs.Path, {
                 required: true
