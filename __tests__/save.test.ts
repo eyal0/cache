@@ -176,7 +176,9 @@ test("save with exact match and updates enabled updates the cache", async () => 
         `Cache hit occurred on the primary key ${primaryKey}, but updates were enabled, so updating cache.`
     );
     expect(saveCacheMock).toHaveBeenCalledTimes(1);
-    expect(saveCacheMock).toHaveBeenCalledWith([inputPath], primaryKey, {"uploadChunkSize": undefined});
+    expect(saveCacheMock).toHaveBeenCalledWith([inputPath], primaryKey, {
+        uploadChunkSize: undefined
+    });
     expect(failedMock).toHaveBeenCalledTimes(0);
 });
 
