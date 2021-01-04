@@ -3,7 +3,7 @@ export enum Inputs {
     Path = "path",
     RestoreKeys = "restore-keys",
     UploadChunkSize = "upload-chunk-size",
-    Update = "update"
+    UpdateEnvVariable = "update-env-variable"
 }
 
 export enum Outputs {

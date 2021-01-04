@@ -30,10 +30,13 @@ async function run(): Promise<void> {
         }
 
         if (utils.isExactKeyMatch(primaryKey, state)) {
-            if (core.getInput(Inputs.Update) === "true") {
-                core.info(
-                    `Cache hit occurred on the primary key ${primaryKey}, but updates were enabled, so updating cache.`
-                );
+            if (core.getInput(Inputs.UpdateEnvVariable) &&
+                typeof process.env[core.getInput(Inputs.UpdateEnvVariable)] !== 'undefined') {
+                if (["true", "yes"].includes(process.env[core.getInput(Inputs.UpdateEnvVariable)]!)) {
+                    core.info(`Cache saving was forced by setting ${core.getInput(Inputs.UpdateEnvVariable)} to ${process.env[core.getInput(Inputs.UpdateEnvVariable)]}.`);
+                } else {
+                    core.info(`Cache saving was disabled by setting ${core.getInput(Inputs.UpdateEnvVariable)} to ${process.env[core.getInput(Inputs.UpdateEnvVariable)]}.`);
+                }
             } else {
                 core.info(
                     `Cache hit occurred on the primary key ${primaryKey}, not saving cache.`
