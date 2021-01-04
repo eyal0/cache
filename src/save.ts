@@ -30,12 +30,33 @@ async function run(): Promise<void> {
         }
 
         if (utils.isExactKeyMatch(primaryKey, state)) {
-            if (core.getInput(Inputs.UpdateEnvVariable) &&
-                typeof process.env[core.getInput(Inputs.UpdateEnvVariable)] !== 'undefined') {
-                if (["true", "yes"].includes(process.env[core.getInput(Inputs.UpdateEnvVariable)]!)) {
-                    core.info(`Cache saving was forced by setting ${core.getInput(Inputs.UpdateEnvVariable)} to ${process.env[core.getInput(Inputs.UpdateEnvVariable)]}.`);
+            if (
+                core.getInput(Inputs.UpdateEnvVariable) &&
+                typeof process.env[core.getInput(Inputs.UpdateEnvVariable)] !==
+                    "undefined"
+            ) {
+                if (
+                    ["true", "yes"].includes(
+                        process.env[
+                            core.getInput(Inputs.UpdateEnvVariable)
+                        ]!.toLowerCase()
+                    )
+                ) {
+                    core.info(
+                        `Cache saving was forced by setting ${core.getInput(
+                            Inputs.UpdateEnvVariable
+                        )} to ${
+                            process.env[core.getInput(Inputs.UpdateEnvVariable)]
+                        }.`
+                    );
                 } else {
-                    core.info(`Cache saving was disabled by setting ${core.getInput(Inputs.UpdateEnvVariable)} to ${process.env[core.getInput(Inputs.UpdateEnvVariable)]}.`);
+                    core.info(
+                        `Cache saving was disabled by setting ${core.getInput(
+                            Inputs.UpdateEnvVariable
+                        )} to ${
+                            process.env[core.getInput(Inputs.UpdateEnvVariable)]
+                        }.`
+                    );
                 }
             } else {
                 core.info(

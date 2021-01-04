@@ -209,11 +209,11 @@ test("save with UpdateEnvVariable false doesn't updates the cache despite mismat
         .mockImplementationOnce(() => {
             return Promise.resolve(cacheId);
         });
-    process.env["MY_CACHE_ENV_VARIABLE"] = "false";
+    process.env["MY_CACHE_ENV_VARIABLE"] = "no";
     await run();
 
     expect(infoMock).toHaveBeenCalledWith(
-        "Cache saving was disabled by setting MY_CACHE_ENV_VARIABLE to false."
+        "Cache saving was disabled by setting MY_CACHE_ENV_VARIABLE to no."
     );
     expect(saveCacheMock).toHaveBeenCalledTimes(1);
     expect(saveCacheMock).toHaveBeenCalledWith([inputPath], primaryKey, {
