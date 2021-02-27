@@ -140,7 +140,7 @@ We cache the elements of the Cabal store separately, as the entirety of `~/.caba
     path: |
       ~/.gradle/caches
       ~/.gradle/wrapper
-    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
     restore-keys: |
       ${{ runner.os }}-gradle-
 ```
@@ -195,12 +195,13 @@ If using `npm config` to retrieve the cache directory, ensure you run [actions/s
 
 ```yaml
 - name: Get npm cache directory
-  id: npm-cache
+  id: npm-cache-dir
   run: |
     echo "::set-output name=dir::$(npm config get cache)"
 - uses: actions/cache@v2
+  id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
   with:
-    path: ${{ steps.npm-cache.outputs.dir }}
+    path: ${{ steps.npm-cache-dir.outputs.dir }}
     key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
     restore-keys: |
       ${{ runner.os }}-node-
@@ -345,6 +346,31 @@ Replace `~/.cache/pip` with the correct `path` if not using Ubuntu.
       ${{ runner.os }}-pip-
 ```
 
+### Multiple OS's in a workflow with a matrix
+
+``` yaml
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+        - os: ubuntu-latest
+          path: ~/.cache/pip
+        - os: macos-latest
+          path: ~/Library/Caches/pip
+        - os: windows-latest
+          path: ~\AppData\Local\pip\Cache
+    steps:
+    - uses: actions/cache@v2
+      with:
+        path: ${{ matrix.path }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+         ${{ runner.os }}-pip-
+```
+
 ### Using pip to get cache location
 
 > Note: This requires pip 20.1+
@@ -442,21 +468,18 @@ Replace `~/.local/share/renv` with the correct `path` if not using Ubuntu.
 
 ## Ruby - Bundler
 
-```yaml
-- uses: actions/cache@v2
-  with:
-    path: vendor/bundle
-    key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-    restore-keys: |
-      ${{ runner.os }}-gems-
-```
-When dependencies are installed later in the workflow, we must specify the same path for the bundler.
+Caching gems with Bundler correctly is not trivial and just using `actions/cache`
+is [not enough](https://github.com/ruby/setup-ruby#caching-bundle-install-manually).
+
+Instead, it is recommended to use `ruby/setup-ruby`'s
+[`bundler-cache: true` option](https://github.com/ruby/setup-ruby#caching-bundle-install-automatically)
+whenever possible:
 
 ```yaml
-- name: Bundle install
-  run: |
-    bundle config path vendor/bundle
-    bundle install --jobs 4 --retry 3
+- uses: ruby/setup-ruby@v1
+  with:
+    ruby-version: ...
+    bundler-cache: true
 ```
 
 ## Rust - Cargo
